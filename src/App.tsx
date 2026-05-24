@@ -1,120 +1,94 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { useEffect, useState } from 'react'
 import './App.css'
 
+type Theme = 'light' | 'dark'
+
+const THEME_STORAGE_KEY = 'issueflow-theme'
+
+const getInitialTheme = (): Theme => {
+  if (typeof window === 'undefined') {
+    return 'light'
+  }
+
+  const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY)
+  if (storedTheme === 'light' || storedTheme === 'dark') {
+    return storedTheme
+  }
+
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
+    ? 'dark'
+    : 'light'
+}
+
 function App() {
-  const [count, setCount] = useState(0)
+  const [theme, setTheme] = useState<Theme>(getInitialTheme)
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    window.localStorage.setItem(THEME_STORAGE_KEY, theme)
+  }, [theme])
+
+  const nextTheme = theme === 'light' ? 'dark' : 'light'
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <main className="app-shell">
+      <section className="dashboard-hero" aria-labelledby="dashboard-title">
+        <nav className="topbar" aria-label="Primary navigation">
+          <a className="brand" href="/" aria-label="IssueFlow home">
+            <span className="brand-mark">IF</span>
+            <span>IssueFlow</span>
+          </a>
 
-      <div className="ticks"></div>
+          <button
+            className="theme-toggle"
+            type="button"
+            onClick={() => setTheme(nextTheme)}
+            aria-label={`Switch to ${nextTheme} mode`}
+            aria-pressed={theme === 'dark'}
+          >
+            <span className="toggle-track" aria-hidden="true">
+              <span className="toggle-thumb">{theme === 'light' ? 'L' : 'D'}</span>
+            </span>
+            <span>{theme === 'light' ? 'Light' : 'Dark'} mode</span>
+          </button>
+        </nav>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
+        <div className="hero-grid">
+          <div className="hero-copy">
+            <p className="eyebrow">Open-source issue operations</p>
+            <h1 id="dashboard-title">Ship fixes, track bounties, and keep rewards visible.</h1>
+            <p className="hero-text">
+              IssueFlow brings GitHub issues, wallet readiness, and USDC reward status into one focused workspace.
+            </p>
+            <div className="hero-actions" aria-label="Dashboard actions">
+              <a className="primary-action" href="#bounties">View bounties</a>
+              <a className="secondary-action" href="#wallet">Connect wallet</a>
+            </div>
+          </div>
+
+          <aside className="status-card" aria-label="IssueFlow workspace status">
+            <div className="status-card-header">
+              <span>Workspace pulse</span>
+              <strong>Live</strong>
+            </div>
+            <dl className="metrics">
+              <div>
+                <dt>Open issues</dt>
+                <dd>128</dd>
+              </div>
+              <div>
+                <dt>Active bounties</dt>
+                <dd>42</dd>
+              </div>
+              <div>
+                <dt>USDC queued</dt>
+                <dd>$8.4k</dd>
+              </div>
+            </dl>
+          </aside>
         </div>
       </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    </main>
   )
 }
 
