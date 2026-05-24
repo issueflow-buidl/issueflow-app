@@ -22,7 +22,7 @@ export default function WalletConnect() {
         return;
       }
       setAddress(addressObj.address);
-    } catch (err) {
+    } catch {
       setError('Failed to connect wallet.');
     } finally {
       setLoading(false);
